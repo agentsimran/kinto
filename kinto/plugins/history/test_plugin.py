@@ -37,9 +37,8 @@ class HistoryViewTest(BaseWebTest, unittest.TestCase):
         entry = resp.json['data'][0]
         url = '/buckets/test/history/%s' % entry['id']
         self.app.get(url, headers=self.headers, status=404)
-        self.app.put(url, headers=self.headers, status=404)
-        self.app.patch(url, headers=self.headers, status=404)
-        self.app.delete(url, headers=self.headers, status=404)
+        self.app.get('/historys/%s' % entry['id'],
+                     headers=self.headers, status=404)
 
     def test_history_contains_bucket_creation(self):
         resp = self.app.get('/buckets/test/history',

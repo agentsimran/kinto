@@ -72,6 +72,9 @@ def register_resource(resource_cls, settings=None, viewset=None, depth=1,
     def register_service(endpoint_type, settings):
         """Registers a service in cornice, for the given type."""
         path_pattern = getattr(viewset, '%s_path' % endpoint_type)
+        if path_pattern is None:
+            return
+
         path = path_pattern.format(**path_formatters)
 
         name = viewset.get_service_name(endpoint_type, resource_cls)
@@ -84,7 +87,8 @@ def register_resource(resource_cls, settings=None, viewset=None, depth=1,
         service.resource = resource_cls
         service.collection_path = viewset.collection_path.format(
             **path_formatters)
-        service.record_path = viewset.record_path.format(**path_formatters)
+        if viewset.record_path is not None:
+            service.record_path = viewset.record_path.format(**path_formatters)
         service.type = endpoint_type
 
         methods = getattr(viewset, '%s_methods' % endpoint_type)
@@ -115,7 +119,8 @@ def register_resource(resource_cls, settings=None, viewset=None, depth=1,
         services = [register_service('collection', config.registry.settings),
                     register_service('record', config.registry.settings)]
         for service in services:
-            config.add_cornice_service(service)
+            if service:
+                config.add_cornice_service(service)
 
     info = venusian.attach(resource_cls, callback, category='pyramid',
                            depth=depth)

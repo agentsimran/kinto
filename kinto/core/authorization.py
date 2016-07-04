@@ -202,10 +202,13 @@ class RouteFactory(object):
             record_service = service.name.replace('-collection', '-record')
             matchdict = request.matchdict.copy()
             matchdict['id'] = record_id
-            record_uri = request.route_path(record_service, **matchdict)
+            try:
+                record_uri = request.route_path(record_service, **matchdict)
 
-            if record_id == '*':
-                record_uri = record_uri.replace('%2A', '*')
+                if record_id == '*':
+                    record_uri = record_uri.replace('%2A', '*')
+            except KeyError:
+                pass
 
         return utils.strip_uri_prefix(record_uri)
 
